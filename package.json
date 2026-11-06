@@ -1,0 +1,12 @@
+{
+    "name": "Reactor-de-mezcla-industrial",
+    "description": "Proyecto sobre un Mezclador industrial 6TO B",
+    "version": "0.0.1",
+    "dependencies": {},
+    "node-red": {
+        "settings": {
+            "flowFile": "flows.json",
+            "credentialsFile": "flows_cred.json"
+        }
+    }
+}
