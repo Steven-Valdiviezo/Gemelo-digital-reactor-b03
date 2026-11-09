@@ -1,1 +1,2255 @@
-[]
+[
+    {
+        "id": "tab_b03_sim",
+        "type": "tab",
+        "label": "B03 · 1. Simulador Físico (Nodos Nativos)",
+        "disabled": false,
+        "info": "Simulación dinámica cada 1 segundo usando únicamente nodos inject, switch y change con expresiones JSONata (CERO nodos function)."
+    },
+    {
+        "id": "tab_b03_kpis",
+        "type": "tab",
+        "label": "B03 · 2. Control, KPIs, Alarmas e Históricos",
+        "disabled": false,
+        "info": "Evaluación de las 3 alarmas reglamentarias, cálculo de los 5 KPIs y persistencia local en disco usando nodos switch, change y file."
+    },
+    {
+        "id": "tab_b03_api",
+        "type": "tab",
+        "label": "B03 · 3. API HTTP/REST (/api/B03/*)",
+        "disabled": false,
+        "info": "7 Endpoints HTTP/REST validados con nodos switch, change y template (200, 201, 400, 404, 409) sin nodos function, más ruta GET /dashboard."
+    },
+    {
+        "id": "c_sim_header",
+        "type": "comment",
+        "z": "tab_b03_sim",
+        "name": "PROYECTO B03: REACTOR DE MEZCLA INDUSTRIAL",
+        "info": "",
+        "x": 290,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "inj_init",
+        "type": "inject",
+        "z": "tab_b03_sim",
+        "name": "Inicializar Reactor (Al arrancar)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.1",
+        "topic": "",
+        "payload": "init",
+        "payloadType": "str",
+        "x": 210,
+        "y": 220,
+        "wires": [
+            [
+                "chg_init_vars"
+            ]
+        ]
+    },
+    {
+        "id": "chg_init_vars",
+        "type": "change",
+        "z": "tab_b03_sim",
+        "name": "Configurar Estado Inicial B03 (Contexto Global)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "IDLE",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "activeBatchId",
+                "pt": "global",
+                "to": "NINGUNO",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "level_L",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "temperature_C",
+                "pt": "global",
+                "to": "25",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "concentration_pct",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "sp_temp_C",
+                "pt": "global",
+                "to": "65",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "sp_rpm",
+                "pt": "global",
+                "to": "450",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "target_vol_L",
+                "pt": "global",
+                "to": "400",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "fault_heater_runaway",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_heater_off",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_agitator",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_overfill",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "uptime_s",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "batch_elapsed_s",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "last_batch_duration_s",
+                "pt": "global",
+                "to": "78",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "completed_batches",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "total_volume_L",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "energy_kWh",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "heater_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "motor_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "history",
+                "pt": "global",
+                "to": "[]",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "batches",
+                "pt": "global",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "alarms",
+                "pt": "global",
+                "to": "[]",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inj_tick_1s",
+        "type": "inject",
+        "z": "tab_b03_sim",
+        "name": "Reloj de Simulación (Δt = 1 s)",
+        "props": [
+            {
+                "p": "timestamp",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1.2",
+        "topic": "tick",
+        "x": 190,
+        "y": 440,
+        "wires": [
+            [
+                "sw_phase_machine"
+            ]
+        ]
+    },
+    {
+        "id": "sw_phase_machine",
+        "type": "switch",
+        "z": "tab_b03_sim",
+        "name": "Máquina de Estados por Lote (global.phase)",
+        "property": "phase",
+        "propertyType": "global",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "IDLE",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "FILLING",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "HEATING_MIXING",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "DRAINING",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ABORTED",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 5,
+        "x": 550,
+        "y": 380,
+        "wires": [
+            [
+                "chg_phase_idle"
+            ],
+            [
+                "chg_phase_filling"
+            ],
+            [
+                "chg_phase_heating"
+            ],
+            [
+                "chg_phase_draining"
+            ],
+            [
+                "chg_phase_aborted"
+            ]
+        ]
+    },
+    {
+        "id": "chg_phase_idle",
+        "type": "change",
+        "z": "tab_b03_sim",
+        "name": "Estado 0: IDLE (Reposo y enfriamiento natural)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "level_L",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "concentration_pct",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "heater_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "motor_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "temperature_C",
+                "pt": "global",
+                "to": "$round($max([25, $globalContext('temperature_C') - 0.04 * ($globalContext('temperature_C') - 25) + ($random() - 0.5) * 0.1]), 2)",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1080,
+        "y": 240,
+        "wires": [
+            [
+                "link_out_to_kpis"
+            ]
+        ]
+    },
+    {
+        "id": "chg_phase_filling",
+        "type": "change",
+        "z": "tab_b03_sim",
+        "name": "Estado 1: FILLING (Llenado +20 L/s y transición)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "level_L",
+                "pt": "global",
+                "to": "$round($min([500, $globalContext('level_L') + 20]), 1)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "batch_elapsed_s",
+                "pt": "global",
+                "to": "$globalContext('batch_elapsed_s') + 1",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "heater_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "motor_kW",
+                "pt": "global",
+                "to": "0.2",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "$not($globalContext('fault_overfill')) and $globalContext('level_L') >= $globalContext('target_vol_L') and $not($globalContext('fault_agitator')) ? $round($globalContext('sp_rpm') * 0.35, 1) : $globalContext('agitation_rpm')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "$not($globalContext('fault_overfill')) and $globalContext('level_L') >= $globalContext('target_vol_L') ? 'HEATING_MIXING' : 'FILLING'",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1070,
+        "y": 300,
+        "wires": [
+            [
+                "link_out_to_kpis"
+            ]
+        ]
+    },
+    {
+        "id": "chg_phase_heating",
+        "type": "change",
+        "z": "tab_b03_sim",
+        "name": "Estado 2: HEATING_MIXING (Balance térmico, RPM y Mezcla)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "batch_elapsed_s",
+                "pt": "global",
+                "to": "$globalContext('batch_elapsed_s') + 1",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "temperature_C",
+                "pt": "global",
+                "to": "$round(($globalContext('fault_heater_off') ? $globalContext('temperature_C') - 0.04 * ($globalContext('temperature_C') - 25) : ($globalContext('fault_heater_runaway') ? $globalContext('temperature_C') + 1.85 : $globalContext('temperature_C') + 0.18 * ($globalContext('sp_temp_C') - $globalContext('temperature_C')))) + ($random() - 0.5) * 0.12, 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "$round($globalContext('fault_agitator') ? 0 : $max([0, $globalContext('agitation_rpm') + 0.35 * ($globalContext('sp_rpm') - $globalContext('agitation_rpm')) + ($random() - 0.5) * 2]), 1)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "concentration_pct",
+                "pt": "global",
+                "to": "$round($globalContext('agitation_rpm') >= 20 ? $min([100, $globalContext('concentration_pct') + 2.35 * ($globalContext('agitation_rpm') / 450) * ($globalContext('temperature_C') / 65)]) : $globalContext('concentration_pct'), 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "heater_kW",
+                "pt": "global",
+                "to": "$round($globalContext('fault_heater_off') ? 0 : ($globalContext('fault_heater_runaway') ? 18 : $max([1.5, $min([18, ($globalContext('sp_temp_C') - $globalContext('temperature_C')) * 1.8 + 3.2])])), 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "motor_kW",
+                "pt": "global",
+                "to": "$round(($globalContext('agitation_rpm') / 600) * 2.4, 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "$globalContext('concentration_pct') >= 98 and $abs($globalContext('temperature_C') - $globalContext('sp_temp_C')) <= 3.0 ? 'DRAINING' : 'HEATING_MIXING'",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1050,
+        "y": 360,
+        "wires": [
+            [
+                "link_out_to_kpis"
+            ]
+        ]
+    },
+    {
+        "id": "chg_phase_draining",
+        "type": "change",
+        "z": "tab_b03_sim",
+        "name": "Estado 3: DRAINING (Descarga -25 L/s y Cierre de Lote)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "batch_elapsed_s",
+                "pt": "global",
+                "to": "$globalContext('batch_elapsed_s') + 1",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "level_L",
+                "pt": "global",
+                "to": "$round($max([0, $globalContext('level_L') - 25]), 1)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "$round($max([0, $globalContext('agitation_rpm') * 0.45]), 1)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "temperature_C",
+                "pt": "global",
+                "to": "$round($max([25, $globalContext('temperature_C') - 0.06 * ($globalContext('temperature_C') - 25)]), 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "heater_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "motor_kW",
+                "pt": "global",
+                "to": "0.15",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "completed_batches",
+                "pt": "global",
+                "to": "$globalContext('level_L') = 0 ? $globalContext('completed_batches') + 1 : $globalContext('completed_batches')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "total_volume_L",
+                "pt": "global",
+                "to": "$globalContext('level_L') = 0 ? $globalContext('total_volume_L') + $globalContext('target_vol_L') : $globalContext('total_volume_L')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "last_batch_duration_s",
+                "pt": "global",
+                "to": "$globalContext('level_L') = 0 ? $globalContext('batch_elapsed_s') : $globalContext('last_batch_duration_s')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "$globalContext('level_L') = 0 ? 'IDLE' : 'DRAINING'",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1070,
+        "y": 420,
+        "wires": [
+            [
+                "link_out_to_kpis"
+            ]
+        ]
+    },
+    {
+        "id": "chg_phase_aborted",
+        "type": "change",
+        "z": "tab_b03_sim",
+        "name": "Estado 4: ABORTED (Corte térmico y vaciado seguro -35 L/s)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "heater_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "motor_kW",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "fault_heater_runaway",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "level_L",
+                "pt": "global",
+                "to": "$round($max([0, $globalContext('level_L') - 35]), 1)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "temperature_C",
+                "pt": "global",
+                "to": "$round($max([25, $globalContext('temperature_C') - 0.12 * ($globalContext('temperature_C') - 25)]), 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "$globalContext('level_L') = 0 ? 'IDLE' : 'ABORTED'",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1080,
+        "y": 480,
+        "wires": [
+            [
+                "link_out_to_kpis"
+            ]
+        ]
+    },
+    {
+        "id": "link_out_to_kpis",
+        "type": "link out",
+        "z": "tab_b03_sim",
+        "name": "Hacia Flow 2 (KPIs y Alarmas)",
+        "mode": "link",
+        "links": [
+            "link_in_from_sim"
+        ],
+        "x": 1435,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "c_kpis_header",
+        "type": "comment",
+        "z": "tab_b03_kpis",
+        "name": "CÁLCULO DE 5 KPIs, 3 ALARMAS CON RECONOCIMIENTO Y REGISTRO HISTÓRICO EN DISCO",
+        "info": "",
+        "x": 430,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "link_in_from_sim",
+        "type": "link in",
+        "z": "tab_b03_kpis",
+        "name": "Pulso desde Simulador 1s",
+        "links": [
+            "link_out_to_kpis"
+        ],
+        "x": 325,
+        "y": 320,
+        "wires": [
+            [
+                "chg_calc_kpis",
+                "sw_alarm_overtemp",
+                "sw_alarm_maxlevel",
+                "sw_alarm_agitator"
+            ]
+        ]
+    },
+    {
+        "id": "chg_calc_kpis",
+        "type": "change",
+        "z": "tab_b03_kpis",
+        "name": "Calcular 5 KPIs y Actualizar Arreglo Histórico (JSONata)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "uptime_s",
+                "pt": "global",
+                "to": "$globalContext('uptime_s') + 1",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "energy_kWh",
+                "pt": "global",
+                "to": "$round($globalContext('energy_kWh') + (($globalContext('heater_kW') + $globalContext('motor_kW')) / 3600), 4)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "kpi_batches_per_h",
+                "pt": "global",
+                "to": "$round($globalContext('completed_batches') / ($max([60, $globalContext('uptime_s')]) / 3600), 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "kpi_batch_duration_min",
+                "pt": "global",
+                "to": "$round($globalContext('last_batch_duration_s') / 60, 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "kpi_thermal_dev_C",
+                "pt": "global",
+                "to": "$round($abs($globalContext('temperature_C') - $globalContext('sp_temp_C')), 2)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "sample",
+                "pt": "msg",
+                "to": "{\"timestamp\": $now(), \"phase\": $globalContext('phase'), \"temperature_C\": $globalContext('temperature_C'), \"sp_temp_C\": $globalContext('sp_temp_C'), \"level_L\": $globalContext('level_L'), \"agitation_rpm\": $globalContext('agitation_rpm'), \"concentration_pct\": $globalContext('concentration_pct')}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "history",
+                "pt": "global",
+                "to": "$append($globalContext('history'), [msg.sample])",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "sample",
+                "tot": "msg"
+            }
+        ],
+        "x": 670,
+        "y": 220,
+        "wires": [
+            [
+                "file_persist_history"
+            ]
+        ]
+    },
+    {
+        "id": "file_persist_history",
+        "type": "file",
+        "z": "tab_b03_kpis",
+        "name": "Guardar Muestra en b03_history.jsonl",
+        "filename": "b03_history.jsonl",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 1090,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "sw_alarm_overtemp",
+        "type": "switch",
+        "z": "tab_b03_kpis",
+        "name": "Alarma 1: Temperatura > 75 °C",
+        "property": "$globalContext('temperature_C') > 75 and $not($exists($filter($append([], $globalContext('alarms')), function($v) { $v.code = 'OVER_TEMP' and $v.acknowledged = false })))",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 600,
+        "y": 300,
+        "wires": [
+            [
+                "chg_register_overtemp"
+            ]
+        ]
+    },
+    {
+        "id": "chg_register_overtemp",
+        "type": "change",
+        "z": "tab_b03_kpis",
+        "name": "Registrar Alarma OVER_TEMP",
+        "rules": [
+            {
+                "t": "set",
+                "p": "alarms",
+                "pt": "global",
+                "to": "$append($append([], $globalContext('alarms')), [{\"id\": \"ALM-TEMP-\" & $string($millis()), \"code\": \"OVER_TEMP\", \"name\": \"Sobretemperatura en reactor\", \"severity\": \"CRITICAL\", \"threshold\": \"> 75.0 °C\", \"value\": $string($globalContext('temperature_C')) & \" °C\", \"timestamp\": $now(), \"acknowledged\": false}])",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 970,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "sw_alarm_maxlevel",
+        "type": "switch",
+        "z": "tab_b03_kpis",
+        "name": "Alarma 2: Nivel >= 480 L",
+        "property": "$globalContext('level_L') >= 480 and $not($exists($filter($append([], $globalContext('alarms')), function($v) { $v.code = 'MAX_LEVEL' and $v.acknowledged = false })))",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 580,
+        "y": 360,
+        "wires": [
+            [
+                "chg_register_maxlevel"
+            ]
+        ]
+    },
+    {
+        "id": "chg_register_maxlevel",
+        "type": "change",
+        "z": "tab_b03_kpis",
+        "name": "Registrar Alarma MAX_LEVEL y Cerrar Válvula",
+        "rules": [
+            {
+                "t": "set",
+                "p": "alarms",
+                "pt": "global",
+                "to": "$append($append([], $globalContext('alarms')), [{\"id\": \"ALM-LVL-\" & $string($millis()), \"code\": \"MAX_LEVEL\", \"name\": \"Nivel máximo alcanzado\", \"severity\": \"CRITICAL\", \"threshold\": \">= 480.0 L\", \"value\": $string($globalContext('level_L')) & \" L\", \"timestamp\": $now(), \"acknowledged\": false}])",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "fault_overfill",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "$globalContext('fault_agitator') ? 0 : $round($globalContext('sp_rpm') * 0.35, 1)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "HEATING_MIXING",
+                "tot": "str"
+            }
+        ],
+        "x": 1020,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "sw_alarm_agitator",
+        "type": "switch",
+        "z": "tab_b03_kpis",
+        "name": "Alarma 3: Agitador < 20 rpm en Mezcla",
+        "property": "$globalContext('phase') = 'HEATING_MIXING' and $globalContext('agitation_rpm') < 20 and $globalContext('sp_rpm') >= 20 and $not($exists($filter($append([], $globalContext('alarms')), function($v) { $v.code = 'AGITATOR_STOPPED' and $v.acknowledged = false })))",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 630,
+        "y": 420,
+        "wires": [
+            [
+                "chg_register_agitator"
+            ]
+        ]
+    },
+    {
+        "id": "chg_register_agitator",
+        "type": "change",
+        "z": "tab_b03_kpis",
+        "name": "Registrar Alarma AGITATOR_STOPPED",
+        "rules": [
+            {
+                "t": "set",
+                "p": "alarms",
+                "pt": "global",
+                "to": "$append($append([], $globalContext('alarms')), [{\"id\": \"ALM-RPM-\" & $string($millis()), \"code\": \"AGITATOR_STOPPED\", \"name\": \"Agitador detenido en etapa de mezcla\", \"severity\": \"HIGH\", \"threshold\": \"< 20 rpm\", \"value\": $string($globalContext('agitation_rpm')) & \" rpm\", \"timestamp\": $now(), \"acknowledged\": false}])",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1000,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c_api_header",
+        "type": "comment",
+        "z": "tab_b03_api",
+        "name": "7 ENDPOINTS HTTP/REST (/api/B03/*)",
+        "info": "",
+        "x": 210,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "http_in_telemetry",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "GET /api/B03/telemetry",
+        "url": "/api/B03/telemetry",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 220,
+        "y": 140,
+        "wires": [
+            [
+                "chg_prep_telemetry"
+            ]
+        ]
+    },
+    {
+        "id": "chg_prep_telemetry",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Cargar Variables Globales y Timestamp ISO",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "timestamp",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "msg",
+                "to": "phase",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "activeBatchId",
+                "pt": "msg",
+                "to": "activeBatchId",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "temperature_C",
+                "pt": "msg",
+                "to": "temperature_C",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "sp_temp_C",
+                "pt": "msg",
+                "to": "sp_temp_C",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "level_L",
+                "pt": "msg",
+                "to": "level_L",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "target_vol_L",
+                "pt": "msg",
+                "to": "target_vol_L",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "msg",
+                "to": "agitation_rpm",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "sp_rpm",
+                "pt": "msg",
+                "to": "sp_rpm",
+                "tot": "global"
+            },
+            {
+                "t": "set",
+                "p": "concentration_pct",
+                "pt": "msg",
+                "to": "concentration_pct",
+                "tot": "global"
+            }
+        ],
+        "x": 530,
+        "y": 140,
+        "wires": [
+            [
+                "tpl_telemetry"
+            ]
+        ]
+    },
+    {
+        "id": "tpl_telemetry",
+        "type": "template",
+        "z": "tab_b03_api",
+        "name": "Plantilla JSON Telemetría",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n  \"deviceId\": \"REACTOR-B03\",\n  \"timestamp\": \"{{timestamp}}\",\n  \"phase\": \"{{phase}}\",\n  \"activeBatchId\": \"{{activeBatchId}}\",\n  \"variables\": {\n    \"temperature\": { \"value\": {{temperature_C}}, \"unit\": \"°C\", \"setpoint\": {{sp_temp_C}} },\n    \"level\": { \"value\": {{level_L}}, \"unit\": \"L\", \"target\": {{target_vol_L}}, \"max\": 500 },\n    \"agitation\": { \"value\": {{agitation_rpm}}, \"unit\": \"rpm\", \"setpoint\": {{sp_rpm}}, \"max\": 600 },\n    \"concentration\": { \"value\": {{concentration_pct}}, \"unit\": \"%\" }\n  }\n}",
+        "output": "json",
+        "x": 850,
+        "y": 140,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_status",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "GET /api/B03/status",
+        "url": "/api/B03/status",
+        "method": "get",
+        "upload": false,
+        "x": 210,
+        "y": 200,
+        "wires": [
+            [
+                "chg_prep_status"
+            ]
+        ]
+    },
+    {
+        "id": "chg_prep_status",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Armar Payload de Estado y Actuadores",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"deviceId\": \"REACTOR-B03\", \"timestamp\": $now(), \"phase\": $globalContext('phase'), \"activeBatchId\": $globalContext('activeBatchId'), \"setpoints\": {\"temperature_C\": $globalContext('sp_temp_C'), \"agitation_rpm\": $globalContext('sp_rpm'), \"targetVolume_L\": $globalContext('target_vol_L')}, \"actuators\": {\"inletValveOpen\": $globalContext('phase') = 'FILLING', \"outletValveOpen\": $globalContext('phase') in ['DRAINING', 'ABORTED'], \"heaterPower_kW\": $globalContext('heater_kW'), \"agitatorMotor_kW\": $globalContext('motor_kW')}, \"faults\": {\"heaterRunaway\": $globalContext('fault_heater_runaway'), \"heaterOff\": $globalContext('fault_heater_off'), \"agitatorFail\": $globalContext('fault_agitator'), \"overfill\": $globalContext('fault_overfill')}, \"alarms\": $append([], $globalContext('alarms'))}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 520,
+        "y": 200,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_kpis",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "GET /api/B03/kpis",
+        "url": "/api/B03/kpis",
+        "method": "get",
+        "upload": false,
+        "x": 210,
+        "y": 260,
+        "wires": [
+            [
+                "chg_prep_kpis"
+            ]
+        ]
+    },
+    {
+        "id": "chg_prep_kpis",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Armar Payload de los 5 KPIs con Fórmulas",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"deviceId\": \"REACTOR-B03\", \"timestamp\": $now(), \"kpis\": {\"batchesPerHour\": {\"value\": $globalContext('kpi_batches_per_h'), \"unit\": \"lotes/h\", \"formula\": \"Lotes_Completados / (Tiempo_Operacion_s / 3600)\"}, \"batchDuration\": {\"value\": $globalContext('kpi_batch_duration_min'), \"unit\": \"min\", \"formula\": \"(t_fin_descarga - t_inicio_llenado) / 60\"}, \"thermalDeviation\": {\"value\": $globalContext('kpi_thermal_dev_C'), \"unit\": \"°C\", \"formula\": \"|T_actual - T_consigna|\"}, \"processedVolume\": {\"value\": $globalContext('total_volume_L'), \"unit\": \"L\", \"formula\": \"Suma(Volumen_Lotes_Exitosos)\"}, \"estimatedEnergy\": {\"value\": $globalContext('energy_kWh'), \"unit\": \"kWh\", \"formula\": \"Suma((P_calentador + P_agitador) * dt / 3600)\"}}}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 530,
+        "y": 260,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_history",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "GET /api/B03/history",
+        "url": "/api/B03/history",
+        "method": "get",
+        "upload": false,
+        "x": 210,
+        "y": 330,
+        "wires": [
+            [
+                "sw_validate_window"
+            ]
+        ]
+    },
+    {
+        "id": "sw_validate_window",
+        "type": "switch",
+        "z": "tab_b03_api",
+        "name": "Validar ?window (1m, 5m, 15m, all)",
+        "property": "$exists(req.query.window) ? req.query.window : '5m'",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "^(1m|5m|15m|all)$",
+                "vt": "str",
+                "case": false
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 490,
+        "y": 330,
+        "wires": [
+            [
+                "chg_history_ok"
+            ],
+            [
+                "chg_history_400"
+            ]
+        ]
+    },
+    {
+        "id": "chg_history_ok",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Filtrar Ventana Temporal (200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"deviceId\": \"REACTOR-B03\", \"timestamp\": $now(), \"window\": $exists(req.query.window) ? req.query.window : \"5m\", \"samples\": $globalContext('history')}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 820,
+        "y": 310,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_history_400",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Error Ventana Inválida (400 Bad Request)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "400",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"error\": \"Parámetro window inválido. Valores permitidos: 1m, 5m, 15m, all\", \"status\": 400, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 840,
+        "y": 355,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_setpoint",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "PUT /api/B03/setpoint",
+        "url": "/api/B03/setpoint",
+        "method": "put",
+        "upload": false,
+        "x": 220,
+        "y": 430,
+        "wires": [
+            [
+                "sw_sp_state_check"
+            ]
+        ]
+    },
+    {
+        "id": "sw_sp_state_check",
+        "type": "switch",
+        "z": "tab_b03_api",
+        "name": "Verificar No Abortado (409 vs Continuar)",
+        "property": "phase",
+        "propertyType": "global",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ABORTED",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 430,
+        "wires": [
+            [
+                "chg_sp_409"
+            ],
+            [
+                "sw_sp_range_check"
+            ]
+        ]
+    },
+    {
+        "id": "sw_sp_range_check",
+        "type": "switch",
+        "z": "tab_b03_api",
+        "name": "Validar Rangos Temp (25-90 °C) y RPM (0-600)",
+        "property": "$number(payload.temperature_C) >= 25 and $number(payload.temperature_C) <= 90 and $number(payload.agitation_rpm) >= 0 and $number(payload.agitation_rpm) <= 600",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 880,
+        "y": 460,
+        "wires": [
+            [
+                "chg_sp_200"
+            ],
+            [
+                "chg_sp_400"
+            ]
+        ]
+    },
+    {
+        "id": "chg_sp_200",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Actualizar Consignas (200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sp_temp_C",
+                "pt": "global",
+                "to": "$number(payload.temperature_C)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "sp_rpm",
+                "pt": "global",
+                "to": "$number(payload.agitation_rpm)",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"Consignas actualizadas correctamente\", \"setpoints\": {\"temperature_C\": $globalContext('sp_temp_C'), \"agitation_rpm\": $globalContext('sp_rpm')}, \"status\": 200, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1230,
+        "y": 400,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_sp_400",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Fuera de Rango (400 Bad Request)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "400",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"error\": \"Consigna fuera de rango permitido (Temperatura: 25-90 °C, Agitación: 0-600 rpm)\", \"status\": 400, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1240,
+        "y": 440,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_sp_409",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Conflicto por Estado ABORTED (409)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "409",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"error\": \"No se pueden cambiar consignas mientras el reactor está en vaciado de emergencia (ABORTED)\", \"status\": 409, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 850,
+        "y": 400,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_commands",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "POST /api/B03/commands",
+        "url": "/api/B03/commands",
+        "method": "post",
+        "upload": false,
+        "x": 130,
+        "y": 560,
+        "wires": [
+            [
+                "sw_cmd_router"
+            ]
+        ]
+    },
+    {
+        "id": "sw_cmd_router",
+        "type": "switch",
+        "z": "tab_b03_api",
+        "name": "Enrutar Comando de Control (payload.command)",
+        "property": "payload.command",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "START_BATCH",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ABORT_BATCH",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ACK_ALARMS",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "SET_FAULT",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "RESET_FAULTS",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 6,
+        "x": 470,
+        "y": 560,
+        "wires": [
+            [
+                "sw_cmd_start_idle"
+            ],
+            [
+                "chg_cmd_abort"
+            ],
+            [
+                "chg_cmd_ack"
+            ],
+            [
+                "chg_cmd_fault"
+            ],
+            [
+                "chg_cmd_reset"
+            ],
+            [
+                "chg_cmd_400"
+            ]
+        ]
+    },
+    {
+        "id": "sw_cmd_start_idle",
+        "type": "switch",
+        "z": "tab_b03_api",
+        "name": "¿Reactor en IDLE?",
+        "property": "phase",
+        "propertyType": "global",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "IDLE",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 830,
+        "y": 520,
+        "wires": [
+            [
+                "chg_cmd_start_200"
+            ],
+            [
+                "chg_cmd_start_409"
+            ]
+        ]
+    },
+    {
+        "id": "chg_cmd_start_200",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Iniciar Lote (200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "activeBatchId",
+                "pt": "global",
+                "to": "$exists(payload.batchId) ? payload.batchId : 'LOT-' & $string($millis())",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "target_vol_L",
+                "pt": "global",
+                "to": "$exists(payload.targetVolume_L) ? $number(payload.targetVolume_L) : 400",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "batch_elapsed_s",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "concentration_pct",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "FILLING",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"Lote iniciado en fase FILLING\", \"batchId\": $globalContext('activeBatchId'), \"phase\": \"FILLING\", \"status\": 200, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1200,
+        "y": 480,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_cmd_start_409",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Reactor Ocupado (409 Conflict)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "409",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"error\": \"Conflicto de estado: el reactor no está en IDLE (Estado actual: \" & $globalContext('phase') & \")\", \"status\": 409, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 1230,
+        "y": 520,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_cmd_abort",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Ejecutar Aborto Seguro (200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "ABORTED",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"Aborto seguro activado: resistencias y agitador apagados, descargando tanque\", \"phase\": \"ABORTED\", \"status\": 200, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 870,
+        "y": 565,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_cmd_ack",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Reconocer Alarmas Activas (ACK · 200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "alarms",
+                "pt": "global",
+                "to": "$append([], $map($append([], $globalContext('alarms')), function($v) { $merge([$v, {\"acknowledged\": true}]) }))",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "fault_heater_runaway",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_heater_off",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_agitator",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_overfill",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "temperature_C",
+                "pt": "global",
+                "to": "$min([74.5, $globalContext('temperature_C')])",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "level_L",
+                "pt": "global",
+                "to": "$min([475, $globalContext('level_L')])",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "agitation_rpm",
+                "pt": "global",
+                "to": "$globalContext('phase') = 'HEATING_MIXING' and $globalContext('agitation_rpm') < 20 ? $max([25, $round($globalContext('sp_rpm') * 0.35, 1)]) : $globalContext('agitation_rpm')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"Todas las alarmas han sido reconocidas (ACK) por el operador\", \"status\": 200, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 890,
+        "y": 605,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_cmd_fault",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Inyectar Falla de Prueba (200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "fault_heater_runaway",
+                "pt": "global",
+                "to": "payload.faultType = 'HEATER_RUNAWAY' ? true : $globalContext('fault_heater_runaway')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "fault_heater_off",
+                "pt": "global",
+                "to": "payload.faultType = 'HEATER_OFF' ? true : $globalContext('fault_heater_off')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "fault_agitator",
+                "pt": "global",
+                "to": "payload.faultType = 'AGITATOR_FAIL' ? true : $globalContext('fault_agitator')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "fault_overfill",
+                "pt": "global",
+                "to": "payload.faultType = 'OVERFILL' ? true : $globalContext('fault_overfill')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"Falla simulada inyectada: \" & payload.faultType, \"status\": 200, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 870,
+        "y": 645,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_cmd_reset",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Restablecer Fallas (200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "fault_heater_runaway",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_heater_off",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_agitator",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "fault_overfill",
+                "pt": "global",
+                "to": "false",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"Fallas restablecidas a operación normal\", \"status\": 200, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 850,
+        "y": 685,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_cmd_400",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Comando Desconocido (400 Bad Request)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "400",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"error\": \"Comando no reconocido en /api/B03/commands\", \"status\": 400, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 880,
+        "y": 725,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_batch_post",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "POST /api/B03/batches/:batchId",
+        "url": "/api/B03/batches/:batchId",
+        "method": "post",
+        "upload": false,
+        "x": 240,
+        "y": 800,
+        "wires": [
+            [
+                "sw_batch_post_idle"
+            ]
+        ]
+    },
+    {
+        "id": "sw_batch_post_idle",
+        "type": "switch",
+        "z": "tab_b03_api",
+        "name": "Verificar IDLE para Crear Lote por ID",
+        "property": "phase",
+        "propertyType": "global",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "IDLE",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 800,
+        "wires": [
+            [
+                "chg_batch_post_201"
+            ],
+            [
+                "chg_cmd_start_409"
+            ]
+        ]
+    },
+    {
+        "id": "chg_batch_post_201",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Crear Lote con ID Único (201 Created)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "activeBatchId",
+                "pt": "global",
+                "to": "req.params.batchId",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "target_vol_L",
+                "pt": "global",
+                "to": "$exists(payload.targetVolume_L) ? $number(payload.targetVolume_L) : 400",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "sp_temp_C",
+                "pt": "global",
+                "to": "$exists(payload.temperature_C) ? $number(payload.temperature_C) : $globalContext('sp_temp_C')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "sp_rpm",
+                "pt": "global",
+                "to": "$exists(payload.agitation_rpm) ? $number(payload.agitation_rpm) : $globalContext('sp_rpm')",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "batch_elapsed_s",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "concentration_pct",
+                "pt": "global",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "phase",
+                "pt": "global",
+                "to": "FILLING",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "batches",
+                "pt": "global",
+                "to": "$merge([$globalContext('batches'), {req.params.batchId: {\"batchId\": req.params.batchId, \"createdAt\": $now(), \"targetVolume_L\": $globalContext('target_vol_L'), \"sp_temp_C\": $globalContext('sp_temp_C'), \"sp_rpm\": $globalContext('sp_rpm'), \"status\": \"IN_PROGRESS\"}}])",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "201",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"message\": \"Lote creado e iniciado exitosamente\", \"batchId\": req.params.batchId, \"phase\": \"FILLING\", \"status\": 201, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 890,
+        "y": 800,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_batch_get",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "GET /api/B03/batches/:batchId",
+        "url": "/api/B03/batches/:batchId",
+        "method": "get",
+        "upload": false,
+        "x": 240,
+        "y": 860,
+        "wires": [
+            [
+                "sw_batch_exists"
+            ]
+        ]
+    },
+    {
+        "id": "sw_batch_exists",
+        "type": "switch",
+        "z": "tab_b03_api",
+        "name": "¿Existe el batchId solicitado?",
+        "property": "$lookup($globalContext('batches'), req.params.batchId)",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 860,
+        "wires": [
+            [
+                "chg_batch_get_200"
+            ],
+            [
+                "chg_batch_get_404"
+            ]
+        ]
+    },
+    {
+        "id": "chg_batch_get_200",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Devolver Datos del Lote (200 OK)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$lookup($globalContext('batches'), req.params.batchId)",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 880,
+        "y": 850,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "chg_batch_get_404",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Lote No Encontrado (404 Not Found)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "404",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"error\": \"No existe ningún lote registrado con ID: \" & req.params.batchId, \"status\": 404, \"timestamp\": $now()}",
+                "tot": "jsonata"
+            }
+        ],
+        "x": 890,
+        "y": 890,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_in_options",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "OPTIONS /api/B03/*",
+        "url": "/api/B03/*",
+        "method": "options",
+        "upload": false,
+        "x": 210,
+        "y": 930,
+        "wires": [
+            [
+                "chg_options_200"
+            ]
+        ]
+    },
+    {
+        "id": "chg_options_200",
+        "type": "change",
+        "z": "tab_b03_api",
+        "name": "Respuesta Preflight CORS (200)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "statusCode",
+                "pt": "msg",
+                "to": "200",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            }
+        ],
+        "x": 510,
+        "y": 930,
+        "wires": [
+            [
+                "http_res_common"
+            ]
+        ]
+    },
+    {
+        "id": "http_res_common",
+        "type": "http response",
+        "z": "tab_b03_api",
+        "name": "HTTP Response (JSON + CORS)",
+        "statusCode": "",
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Content-Type": "application/json; charset=utf-8"
+        },
+        "x": 1860,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "http_in_dashboard_ui",
+        "type": "http in",
+        "z": "tab_b03_api",
+        "name": "GET /dashboard (Interfaz Web B03)",
+        "url": "/dashboard",
+        "method": "get",
+        "upload": false,
+        "x": 240,
+        "y": 990,
+        "wires": [
+            [
+                "tpl_dashboard_ui"
+            ]
+        ]
+    },
+    {
+        "id": "tpl_dashboard_ui",
+        "type": "template",
+        "z": "tab_b03_api",
+        "name": "HTML/CSS/JS Dashboard B03",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "html",
+        "syntax": "plain",
+        "template": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Gemelo Digital B03 · Reactor de Mezcla Industrial (HTTP/REST)</title>\n  <script src=\"https://cdn.tailwindcss.com/3.4.17\"></script>\n  <script src=\"https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js\"></script>\n  <style>\n    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');\n    body { font-family: 'Inter', sans-serif; }\n    .mono { font-family: 'JetBrains Mono', monospace; }\n    @keyframes spinImpeller {\n      from { transform: rotateY(0deg); }\n      to { transform: rotateY(360deg); }\n    }\n    @keyframes pulseFlow {\n      0%, 100% { opacity: 0.35; }\n      50% { opacity: 1; }\n    }\n    .impeller-spin {\n      transform-origin: 160px 185px;\n      animation: spinImpeller var(--spin-duration, 0s) linear infinite;\n    }\n    .flow-active {\n      animation: pulseFlow 0.8s ease-in-out infinite;\n    }\n  </style>\n</head>\n<body class=\"bg-slate-950 text-slate-100 min-h-screen flex flex-col\">\n\n  <!-- Banner de Error de Conexión cuando Node-RED está apagado o no responde -->\n  <div id=\"connectionErrorBanner\" class=\"hidden bg-rose-600 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between border-b border-rose-700 shadow-md\">\n    <div class=\"flex items-center gap-2\">\n      <span class=\"text-base\">⚠</span>\n      <span>Sin conexión con Node-RED en <span id=\"lblFailedUrl\" class=\"mono underline font-bold\">http://localhost:1880</span>. Verifica que Node-RED esté corriendo y que hayas pulsado \"Instanciar (Deploy)\".</span>\n    </div>\n    <span class=\"bg-rose-800/80 px-2 py-0.5 rounded text-[10px] mono\">ERROR HTTP / OFFLINE</span>\n  </div>\n\n  <!-- ===================================================================== -->\n  <!-- ENCABEZADO PRINCIPAL DEL SISTEMA                                      -->\n  <!-- ===================================================================== -->\n  <header class=\"bg-slate-900/95 border-b border-slate-800 sticky top-0 z-30 px-4 py-3\">\n    <div class=\"max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3\">\n      <!-- Identidad del Proceso, Lote Activo y Estado General -->\n      <div class=\"flex items-center gap-3\">\n        <div class=\"w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-extrabold leading-none\">\n          <span class=\"text-sm\">B03</span>\n        </div>\n        <div>\n          <div class=\"flex flex-wrap items-center gap-2\">\n            <h1 class=\"text-base sm:text-lg font-bold tracking-tight text-white\">\n              Reactor de Mezcla Industrial\n            </h1>\n            <span id=\"badgePhase\" class=\"text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700\">DESCONECTADO</span>\n            <span class=\"text-xs bg-slate-950 border border-slate-800 px-2.5 py-0.5 rounded-md text-slate-300\">\n              Lote: <strong id=\"lblActiveBatch\" class=\"mono text-sky-400\">NINGUNO</strong>\n            </span>\n            <span id=\"lblTimestamp\" class=\"text-[11px] mono text-slate-400\">--:--:--</span>\n          </div>\n          <p class=\"text-xs text-slate-400\">UTMACH · Gemelo Digital HTTP/REST · Sistema de Supervisión y Control Industrial</p>\n        </div>\n      </div>\n\n      <!-- Estado de Red y Selector de Vista -->\n      <div class=\"flex flex-wrap items-center gap-2\">\n\n        <div class=\"flex items-center bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs\">\n          <span class=\"text-slate-400 mr-1.5\">API:</span>\n          <input id=\"inputApiBase\" type=\"text\" value=\"http://localhost:1880\" class=\"bg-transparent text-sky-400 mono focus:outline-none w-40 sm:w-44 font-bold\" />\n        </div>\n        <div id=\"statusBadge\" class=\"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-300 text-xs font-bold\">\n          <span id=\"statusDot\" class=\"w-2 h-2 rounded-full bg-rose-500 animate-ping\"></span>\n          <span id=\"statusText\">Desconectado</span>\n        </div>\n        <div class=\"flex rounded-lg bg-slate-950 p-1 border border-slate-800\">\n          <button id=\"tabBtnOp\" type=\"button\" class=\"px-3 py-1 text-xs font-semibold rounded-md bg-sky-600 text-white transition\">\n            1. Vista de Operación\n          </button>\n          <button id=\"tabBtnEng\" type=\"button\" class=\"px-3 py-1 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition\">\n            2. Vista de Ingeniería\n          </button>\n        </div>\n      </div>\n    </div>\n  </header>\n\n  <!-- Toast Notification Banner -->\n  <div id=\"toastBanner\" class=\"hidden fixed bottom-4 right-4 z-50 max-w-md bg-slate-900 border border-slate-700 shadow-2xl rounded-xl px-4 py-3 text-xs flex items-center gap-3\">\n    <span id=\"toastDot\" class=\"w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0\"></span>\n    <div class=\"flex-1\">\n      <p id=\"toastTitle\" class=\"font-bold text-slate-100\">Respuesta HTTP</p>\n      <p id=\"toastMsg\" class=\"text-slate-300 mt-0.5 mono\"></p>\n    </div>\n    <button id=\"btnCloseToast\" type=\"button\" class=\"text-slate-400 hover:text-white text-sm font-bold px-1\">✕</button>\n  </div>\n\n  <!-- Main Workspace Container -->\n  <main class=\"max-w-7xl w-full mx-auto flex-1 p-4 space-y-4\">\n\n\n\n    <!-- ===================================================================== -->\n    <!-- FILA SUPERIOR: 4 Variables Físicas y 5 KPIs de Desempeño              -->\n    <!-- ===================================================================== -->\n    <section class=\"grid grid-cols-1 lg:grid-cols-12 gap-3\">\n\n      <!-- Las 4 Variables Físicas Obligatorias -->\n      <div class=\"lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-xl p-3\">\n        <div class=\"flex items-center justify-between mb-2\">\n          <span class=\"text-[11px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5\">\n            Telemetría Instantánea de las 4 Variables Físicas (/api/B03/telemetry)\n          </span>\n          <span class=\"text-[11px] text-slate-400 mono\">Polling: 1000 ms</span>\n        </div>\n\n        <div class=\"grid grid-cols-2 sm:grid-cols-4 gap-2.5\">\n          <!-- Variable 1: Temperature -->\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg p-2.5\">\n            <div class=\"flex justify-between items-center\">\n              <span class=\"text-[11px] font-medium text-slate-400\">1. Temperatura</span>\n              <span class=\"text-[10px] mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300\">SP:<strong id=\"lblSpTemp\">--</strong>°C</span>\n            </div>\n            <div class=\"mt-1.5 flex items-baseline gap-1\">\n              <span id=\"valTemp\" class=\"text-2xl font-extrabold text-amber-400 mono\">--.-</span>\n              <span class=\"text-xs text-slate-400 font-semibold\">°C</span>\n            </div>\n            <div class=\"mt-2 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden\">\n              <div id=\"barTemp\" class=\"bg-amber-500 h-full transition-all duration-300\" style=\"width: 0%\"></div>\n            </div>\n          </div>\n\n          <!-- Variable 2: Level -->\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg p-2.5\">\n            <div class=\"flex justify-between items-center\">\n              <span class=\"text-[11px] font-medium text-slate-400\">2. Nivel Tanque</span>\n              <span class=\"text-[10px] mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-300\"><strong id=\"lblTargetVol\">--</strong>/500L</span>\n            </div>\n            <div class=\"mt-1.5 flex items-baseline gap-1\">\n              <span id=\"valLevel\" class=\"text-2xl font-extrabold text-sky-400 mono\">--.-</span>\n              <span class=\"text-xs text-slate-400 font-semibold\">L</span>\n            </div>\n            <div class=\"mt-2 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden\">\n              <div id=\"barLevel\" class=\"bg-sky-500 h-full transition-all duration-300\" style=\"width: 0%\"></div>\n            </div>\n          </div>\n\n          <!-- Variable 3: Agitation Speed -->\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg p-2.5\">\n            <div class=\"flex justify-between items-center\">\n              <span class=\"text-[11px] font-medium text-slate-400\">3. Agitación</span>\n              <span class=\"text-[10px] mono px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-300\">SP:<strong id=\"lblSpRpm\">--</strong></span>\n            </div>\n            <div class=\"mt-1.5 flex items-baseline gap-1\">\n              <span id=\"valRpm\" class=\"text-2xl font-extrabold text-violet-400 mono\">--</span>\n              <span class=\"text-xs text-slate-400 font-semibold\">rpm</span>\n            </div>\n            <div class=\"mt-2 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden\">\n              <div id=\"barRpm\" class=\"bg-violet-500 h-full transition-all duration-300\" style=\"width: 0%\"></div>\n            </div>\n          </div>\n\n          <!-- Variable 4: Simulated Concentration -->\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg p-2.5\">\n            <div class=\"flex justify-between items-center\">\n              <span class=\"text-[11px] font-medium text-slate-400\">4. Concentración</span>\n              <span class=\"text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300\">≥98%</span>\n            </div>\n            <div class=\"mt-1.5 flex items-baseline gap-1\">\n              <span id=\"valConc\" class=\"text-2xl font-extrabold text-emerald-400 mono\">--.-</span>\n              <span class=\"text-xs text-slate-400 font-semibold\">%</span>\n            </div>\n            <div class=\"mt-2 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden\">\n              <div id=\"barConc\" class=\"bg-emerald-500 h-full transition-all duration-300\" style=\"width: 0%\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <!-- Los 5 KPIs de Desempeño Industrial (/api/B03/kpis) -->\n      <div class=\"lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between\">\n        <div class=\"flex items-center justify-between mb-2\">\n          <span class=\"text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5\">\n            5 KPIs de Desempeño (/api/B03/kpis)\n          </span>\n        </div>\n\n        <div class=\"grid grid-cols-2 sm:grid-cols-3 gap-2\">\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg px-2.5 py-2\">\n            <p class=\"text-[10px] text-slate-400\">KPI 1 · Productividad</p>\n            <p class=\"text-sm font-bold text-white mono mt-0.5\"><span id=\"kpiBatchesH\">--</span> <span class=\"text-[10px] font-normal text-slate-400\">lotes/h</span></p>\n          </div>\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg px-2.5 py-2\">\n            <p class=\"text-[10px] text-slate-400\">KPI 2 · Duración Lote</p>\n            <p class=\"text-sm font-bold text-white mono mt-0.5\"><span id=\"kpiDurationMin\">--</span> <span class=\"text-[10px] font-normal text-slate-400\">min</span></p>\n          </div>\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg px-2.5 py-2\">\n            <p class=\"text-[10px] text-slate-400\">KPI 3 · Desv. Térmica</p>\n            <p class=\"text-sm font-bold text-amber-300 mono mt-0.5\"><span id=\"kpiThermalDev\">--</span> <span class=\"text-[10px] font-normal text-slate-400\">°C</span></p>\n          </div>\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg px-2.5 py-2\">\n            <p class=\"text-[10px] text-slate-400\">KPI 4 · Vol. Procesado</p>\n            <p class=\"text-sm font-bold text-sky-300 mono mt-0.5\"><span id=\"kpiVolumeL\">--</span> <span class=\"text-[10px] font-normal text-slate-400\">L</span></p>\n          </div>\n          <div class=\"bg-slate-950 border border-slate-800/90 rounded-lg px-2.5 py-2 col-span-2 sm:col-span-2\">\n            <p class=\"text-[10px] text-slate-400\">KPI 5 · Consumo Eléctrico Estimado</p>\n            <p class=\"text-sm font-bold text-emerald-300 mono mt-0.5\"><span id=\"kpiEnergyKwh\">--</span> <span class=\"text-[10px] font-normal text-slate-400\">kWh (Σ P·Δt/3600)</span></p>\n          </div>\n        </div>\n      </div>\n\n    </section>\n\n    <!-- ===================================================================== -->\n    <!-- PANEL DE OPERACIÓN: Sinóptico, Alarmas y Controles                    -->\n    <!-- ===================================================================== -->\n    <div id=\"viewOperation\" class=\"grid grid-cols-1 lg:grid-cols-12 gap-4\">\n\n      <!-- Sinóptico Animado + Estado de Alarmas -->\n      <div class=\"lg:col-span-6 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3\">\n        <div class=\"flex items-center justify-between\">\n          <div>\n            <span class=\"text-[11px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5\">\n              Supervisión Visual del Proceso y Alarmas\n            </span>\n            <h2 class=\"text-sm font-bold text-white mt-0.5\">Sinóptico Animado del Reactor B03 y Actuadores</h2>\n          </div>\n        </div>\n\n        <div class=\"grid grid-cols-1 sm:grid-cols-12 gap-3 items-center bg-slate-950/70 rounded-xl border border-slate-800/80 p-3\">\n          <!-- Dibujo SVG del Reactor -->\n          <div class=\"sm:col-span-7 flex justify-center\">\n            <svg viewBox=\"0 0 320 310\" class=\"w-full max-w-[260px] h-auto\">\n              <path d=\"M 30 35 L 105 35 L 105 65\" fill=\"none\" stroke=\"#334155\" stroke-width=\"10\" stroke-linecap=\"round\"/>\n              <path id=\"svgInletStream\" d=\"M 30 35 L 105 35 L 105 250\" fill=\"none\" stroke=\"#38bdf8\" stroke-width=\"5\" stroke-dasharray=\"6 4\" class=\"hidden flow-active\"/>\n              <circle id=\"svgInletValve\" cx=\"68\" cy=\"35\" r=\"10\" fill=\"#ef4444\" stroke=\"#0f172a\" stroke-width=\"2\"/>\n              <text x=\"68\" y=\"18\" text-anchor=\"middle\" fill=\"#94a3b8\" font-size=\"9\" font-weight=\"bold\">Válvula Entrada</text>\n\n              <rect x=\"138\" y=\"12\" width=\"44\" height=\"36\" rx=\"6\" fill=\"#475569\" stroke=\"#94a3b8\" stroke-width=\"2\"/>\n              <text x=\"160\" y=\"34\" text-anchor=\"middle\" fill=\"#f8fafc\" font-size=\"9\" font-weight=\"bold\">MOTOR</text>\n\n              <rect x=\"75\" y=\"60\" width=\"170\" height=\"190\" rx=\"18\" fill=\"#0f172a\" stroke=\"#64748b\" stroke-width=\"4\"/>\n\n              <clipPath id=\"tankClip\">\n                <rect x=\"79\" y=\"64\" width=\"162\" height=\"182\" rx=\"14\"/>\n              </clipPath>\n              <g clip-path=\"url(#tankClip)\">\n                <rect id=\"svgLiquidRect\" x=\"79\" y=\"246\" width=\"162\" height=\"0\" fill=\"#0284c7\" fill-opacity=\"0.78\"/>\n              </g>\n\n              <line x1=\"232\" y1=\"82\" x2=\"243\" y2=\"82\" stroke=\"#94a3b8\" stroke-width=\"1.5\"/>\n              <text x=\"228\" y=\"85\" text-anchor=\"end\" fill=\"#94a3b8\" font-size=\"8\">480L (Máx)</text>\n              <line x1=\"232\" y1=\"105\" x2=\"243\" y2=\"105\" stroke=\"#94a3b8\" stroke-width=\"1.5\"/>\n              <text x=\"228\" y=\"108\" text-anchor=\"end\" fill=\"#94a3b8\" font-size=\"8\">400L</text>\n              <line x1=\"232\" y1=\"160\" x2=\"243\" y2=\"160\" stroke=\"#94a3b8\" stroke-width=\"1.5\"/>\n              <text x=\"228\" y=\"163\" text-anchor=\"end\" fill=\"#94a3b8\" font-size=\"8\">250L</text>\n\n              <line x1=\"160\" y1=\"48\" x2=\"160\" y2=\"195\" stroke=\"#cbd5e1\" stroke-width=\"4\"/>\n              <g id=\"svgImpeller\" class=\"impeller-spin\" style=\"--spin-duration: 0s;\">\n                <ellipse cx=\"140\" cy=\"185\" rx=\"20\" ry=\"7\" fill=\"#a78bfa\" stroke=\"#ddd6fe\" stroke-width=\"1.5\"/>\n                <ellipse cx=\"180\" cy=\"185\" rx=\"20\" ry=\"7\" fill=\"#8b5cf6\" stroke=\"#ddd6fe\" stroke-width=\"1.5\"/>\n                <circle cx=\"160\" cy=\"185\" r=\"5\" fill=\"#f8fafc\"/>\n              </g>\n\n              <path id=\"svgHeaterCoil\" d=\"M 85 232 Q 105 220 125 232 T 165 232 T 205 232 T 235 232\" fill=\"none\" stroke=\"#475569\" stroke-width=\"5\" stroke-linecap=\"round\"/>\n              <text x=\"160\" y=\"244\" text-anchor=\"middle\" fill=\"#cbd5e1\" font-size=\"8\" font-weight=\"bold\">Resistencia Térmica</text>\n\n              <path d=\"M 160 250 L 160 292 L 265 292\" fill=\"none\" stroke=\"#334155\" stroke-width=\"10\" stroke-linecap=\"round\"/>\n              <path id=\"svgOutletStream\" d=\"M 160 250 L 160 292 L 265 292\" fill=\"none\" stroke=\"#34d399\" stroke-width=\"5\" stroke-dasharray=\"6 4\" class=\"hidden flow-active\"/>\n              <circle id=\"svgOutletValve\" cx=\"205\" cy=\"292\" r=\"10\" fill=\"#ef4444\" stroke=\"#0f172a\" stroke-width=\"2\"/>\n              <text x=\"205\" y=\"276\" text-anchor=\"middle\" fill=\"#94a3b8\" font-size=\"9\" font-weight=\"bold\">Válvula Descarga</text>\n            </svg>\n          </div>\n\n          <!-- Estado de los 4 Actuadores -->\n          <div class=\"sm:col-span-5 space-y-2 text-xs\">\n            <div class=\"bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 flex justify-between items-center\">\n              <span class=\"text-slate-400\">Válv. Entrada:</span>\n              <span id=\"actInlet\" class=\"font-bold text-slate-500\">--</span>\n            </div>\n            <div class=\"bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 flex justify-between items-center\">\n              <span class=\"text-slate-400\">Válv. Descarga:</span>\n              <span id=\"actOutlet\" class=\"font-bold text-slate-500\">--</span>\n            </div>\n            <div class=\"bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 flex justify-between items-center\">\n              <span class=\"text-slate-400\">Calentador:</span>\n              <span id=\"actHeater\" class=\"font-bold text-slate-500 mono\">--.- kW</span>\n            </div>\n            <div class=\"bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 flex justify-between items-center\">\n              <span class=\"text-slate-400\">Motor Agitador:</span>\n              <span id=\"actMotor\" class=\"font-bold text-slate-500 mono\">--.- kW</span>\n            </div>\n          </div>\n        </div>\n\n        <!-- Tabla de las 3 Alarmas Reglamentarias -->\n        <div class=\"bg-slate-950/80 border border-slate-800 rounded-xl p-3\">\n          <div class=\"flex items-center justify-between mb-2\">\n            <div>\n              <h3 class=\"text-xs font-bold text-white\">Monitor de las 3 Alarmas Reglamentarias</h3>\n              <p class=\"text-[11px] text-slate-400\">Sobretemperatura (&gt;75 °C) · Nivel máximo (≥480 L) · Agitador detenido (&lt;20 rpm)</p>\n            </div>\n          </div>\n          <div class=\"overflow-x-auto max-h-36\">\n            <table class=\"w-full text-left text-xs\">\n              <thead>\n                <tr class=\"border-b border-slate-800 text-slate-400 text-[11px]\">\n                  <th class=\"py-1.5 px-2\">Alarma</th>\n                  <th class=\"py-1.5 px-2\">Severidad</th>\n                  <th class=\"py-1.5 px-2\">Umbral</th>\n                  <th class=\"py-1.5 px-2\">Valor</th>\n                  <th class=\"py-1.5 px-2\">Hora</th>\n                  <th class=\"py-1.5 px-2\">Estado</th>\n                </tr>\n              </thead>\n              <tbody id=\"tbodyAlarms\" class=\"divide-y divide-slate-800/60 mono text-[11px]\">\n                <tr>\n                  <td colspan=\"6\" class=\"py-3 text-center text-slate-500\">Esperando datos de telemetría desde Node-RED...</td>\n                </tr>\n              </tbody>\n            </table>\n          </div>\n        </div>\n      </div>\n\n      <!-- Controles y Botones de Acción -->\n      <div class=\"lg:col-span-6 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4\">\n        <div>\n          <div class=\"flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3\">\n            <div>\n              <span class=\"text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5\">\n                Zona de Toma de Decisiones y Comandos HTTP\n              </span>\n              <h2 class=\"text-sm font-bold text-white mt-0.5\">Acciones de Control sobre el Gemelo Digital</h2>\n            </div>\n          </div>\n\n          <!-- Acción 1: Operaciones por Lote con ID Único (POST & GET /api/B03/batches/:batchId) -->\n          <div class=\"mt-4 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-2.5\">\n            <div class=\"flex items-center justify-between\">\n              <span class=\"text-xs font-bold text-emerald-400\">1. Gestión de Lotes por ID Único (<code class=\"mono\">/api/B03/batches/:batchId</code>)</span>\n              <span class=\"text-[10px] mono text-slate-400\">Códigos: 201 / 200 / 404 / 409</span>\n            </div>\n            <div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\">\n              <div>\n                <label for=\"inputBatchId\" class=\"block text-xs text-slate-400 mb-1\">Identificador Único del Lote:</label>\n                <input id=\"inputBatchId\" type=\"text\" value=\"LOT-2026-01\" class=\"w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-sky-500\" />\n              </div>\n              <div>\n                <label for=\"inputTargetVol\" class=\"block text-xs text-slate-400 mb-1\">Volumen Objetivo (100–500 L):</label>\n                <input id=\"inputTargetVol\" type=\"number\" min=\"100\" max=\"500\" step=\"10\" value=\"400\" class=\"w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-sky-500\" />\n              </div>\n            </div>\n            <div class=\"flex gap-2.5 pt-1\">\n              <button id=\"btnStartBatch\" type=\"button\" class=\"flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 transition\">\n                ▶ Iniciar Nuevo Lote (POST)\n              </button>\n              <button id=\"btnQueryBatch\" type=\"button\" class=\"py-2.5 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition\">\n                🔍 Consultar ID (GET)\n              </button>\n            </div>\n          </div>\n\n          <!-- Acción 2 y 3: Ajuste de Consignas de Temperatura y Agitación (PUT /api/B03/setpoint) -->\n          <div class=\"mt-3.5 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800 space-y-2.5\">\n            <div class=\"flex items-center justify-between\">\n              <span class=\"text-xs font-bold text-sky-400\">2. Ajuste Dinámico de Consignas (<code class=\"mono\">PUT /api/B03/setpoint</code>)</span>\n              <span class=\"text-[10px] mono text-slate-400\">Códigos: 200 / 400 / 409</span>\n            </div>\n            <div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\">\n              <div>\n                <label for=\"inputSpTemp\" class=\"block text-xs text-slate-400 mb-1\">Consigna Temperatura (25–90 °C):</label>\n                <input id=\"inputSpTemp\" type=\"number\" step=\"1\" value=\"65\" class=\"w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-300 mono focus:outline-none focus:border-amber-500\" />\n              </div>\n              <div>\n                <label for=\"inputSpRpm\" class=\"block text-xs text-slate-400 mb-1\">Consigna Agitación (0–600 rpm):</label>\n                <input id=\"inputSpRpm\" type=\"number\" step=\"10\" value=\"450\" class=\"w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-violet-300 mono focus:outline-none focus:border-violet-500\" />\n              </div>\n            </div>\n            <button id=\"btnUpdateSetpoint\" type=\"button\" class=\"w-full py-2.5 px-4 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-lg shadow-sky-950/50 transition\">\n              ↻ Aplicar Consignas en Caliente (PUT)\n            </button>\n          </div>\n        </div>\n\n        <!-- Cierre de la Z (Esquina Inferior Derecha): Botones Críticos de Seguridad y Reconocimiento -->\n        <div class=\"bg-slate-950/90 p-3.5 rounded-xl border border-rose-500/30 space-y-2\">\n          <div class=\"flex items-center justify-between\">\n            <span class=\"text-xs font-bold text-rose-400\">3. Seguridad Industrial y Reconocimiento (<code class=\"mono\">POST /api/B03/commands</code>)</span>\n            <span class=\"text-[10px] mono text-rose-300\">Control de Emergencia y ACK</span>\n          </div>\n          <div class=\"grid grid-cols-1 sm:grid-cols-2 gap-2.5\">\n            <button id=\"btnAckAlarms\" type=\"button\" class=\"py-2.5 px-3 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition\">\n              ✓ Reconocer Alarmas (ACK)\n            </button>\n            <button id=\"btnAbortBatch\" type=\"button\" class=\"py-2.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-950/60 transition\">\n              ⚠ ABORTO SEGURO (Vaciado)\n            </button>\n          </div>\n        </div>\n\n      </div>\n    </div>\n\n    <!-- ===================================================================== -->\n    <!-- VIEW 2: VISTA DE INGENIERÍA                                           -->\n    <!-- ===================================================================== -->\n    <div id=\"viewEngineering\" class=\"hidden space-y-4\">\n\n      <!-- Gráficas Históricas con Selector de Ventana -->\n      <div class=\"bg-slate-900 border border-slate-800 rounded-xl p-4\">\n        <div class=\"flex flex-wrap items-center justify-between gap-2 mb-3\">\n          <div>\n            <span class=\"text-[10px] font-bold uppercase tracking-wider text-sky-400 mono\">Análisis Temporal de Proceso</span>\n            <h2 class=\"text-sm font-bold text-white\">Tendencias Históricas (<code class=\"text-sky-400\">GET /api/B03/history</code>)</h2>\n          </div>\n          <div class=\"flex flex-wrap items-center gap-1.5\">\n            <span class=\"text-[10px] font-bold uppercase tracking-wider text-indigo-400 mono mr-1\">Filtro Temporal:</span>\n            <button type=\"button\" data-window=\"1m\" class=\"btn-window px-2.5 py-1 rounded text-xs font-semibold bg-sky-600 text-white\">1 min (60 s)</button>\n            <button type=\"button\" data-window=\"5m\" class=\"btn-window px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700\">5 min (300 s)</button>\n            <button type=\"button\" data-window=\"15m\" class=\"btn-window px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700\">15 min (900 s)</button>\n            <button type=\"button\" id=\"btnInvalidWindow\" class=\"px-2.5 py-1 rounded text-xs font-semibold bg-rose-950/80 text-rose-300 border border-rose-700/50 hover:bg-rose-900/60\">Probar ?window=xyz (400)</button>\n          </div>\n        </div>\n\n        <div class=\"grid grid-cols-1 lg:grid-cols-2 gap-4\">\n          <div class=\"bg-slate-950 border border-slate-800 rounded-lg p-3\">\n            <p class=\"text-xs font-semibold text-amber-300 mb-2\">Histórico 1: Temperatura (°C) vs Consigna (°C)</p>\n            <div class=\"relative h-60\">\n              <canvas id=\"chartTemp\"></canvas>\n            </div>\n          </div>\n          <div class=\"bg-slate-950 border border-slate-800 rounded-lg p-3\">\n            <p class=\"text-xs font-semibold text-sky-300 mb-2\">Histórico 2: Nivel (L), Agitación (rpm) y Concentración (%)</p>\n            <div class=\"relative h-60\">\n              <canvas id=\"chartProcess\"></canvas>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <!-- Bitácora de Auditoría y Banco de 5 Pruebas -->\n      <div class=\"grid grid-cols-1 lg:grid-cols-12 gap-4\">\n\n        <!-- Bitácora de Solicitudes HTTP (Evidencia Observada) -->\n        <div class=\"lg:col-span-6 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between\">\n          <div class=\"flex items-center justify-between mb-2\">\n            <div>\n              <span class=\"text-[10px] font-bold uppercase tracking-wider text-sky-400 mono\">Auditoría y Evidencia HTTP</span>\n              <h2 class=\"text-sm font-bold text-white\">Bitácora de Solicitudes HTTP de Control (Código y Latencia)</h2>\n              <p class=\"text-xs text-slate-400\">Registro de método, endpoint, código HTTP (200/201/400/404/409) y tiempo (ms)</p>\n            </div>\n            <button id=\"btnClearLogs\" type=\"button\" class=\"text-xs text-slate-400 hover:text-white\">Limpiar</button>\n          </div>\n\n          <div class=\"overflow-x-auto max-h-64\">\n            <table class=\"w-full text-left text-xs\">\n              <thead>\n                <tr class=\"border-b border-slate-800 text-slate-400\">\n                  <th class=\"py-1.5 px-2\">Hora</th>\n                  <th class=\"py-1.5 px-2\">Método / Endpoint</th>\n                  <th class=\"py-1.5 px-2\">Código HTTP</th>\n                  <th class=\"py-1.5 px-2\">Latencia</th>\n                  <th class=\"py-1.5 px-2\">Detalle</th>\n                </tr>\n              </thead>\n              <tbody id=\"tbodyHttpLogs\" class=\"divide-y divide-slate-800/60 mono\">\n                <tr>\n                  <td colspan=\"5\" class=\"py-4 text-center text-slate-500\">Ejecuta un comando para registrar su código HTTP y tiempo de respuesta.</td>\n                </tr>\n              </tbody>\n            </table>\n          </div>\n        </div>\n\n        <!-- Banco de las 5 Pruebas de Aceptación (Acción de Ingeniería) -->\n        <div class=\"lg:col-span-6 bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3\">\n          <div class=\"flex items-center justify-between\">\n            <div>\n              <span class=\"text-[10px] font-bold uppercase tracking-wider text-emerald-400 mono\">Ejecución de Pruebas</span>\n              <h2 class=\"text-sm font-bold text-white\">Banco de las 5 Pruebas de Aceptación Reproducibles</h2>\n              <p class=\"text-xs text-slate-400\">Ejecuta las solicitudes HTTP reales contra Node-RED</p>\n            </div>\n            <button id=\"btnResetFaults\" type=\"button\" class=\"px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700\">\n              Restablecer Fallas\n            </button>\n          </div>\n\n          <div class=\"grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs\">\n            <button id=\"btnTest1\" type=\"button\" class=\"p-3 rounded-lg bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition\">\n              <p class=\"font-bold text-emerald-400\">Prueba 1 · Lote Normal</p>\n              <p class=\"text-slate-400 mt-0.5\">POST /batches/LOT-xxx (Código 201 Created).</p>\n            </button>\n            <button id=\"btnTest2a\" type=\"button\" class=\"p-3 rounded-lg bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition\">\n              <p class=\"font-bold text-sky-400\">Prueba 2A · Consigna Válida</p>\n              <p class=\"text-slate-400 mt-0.5\">PUT /setpoint a 70 °C y 520 rpm (Código 200 OK).</p>\n            </button>\n            <button id=\"btnTest2b\" type=\"button\" class=\"p-3 rounded-lg bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition\">\n              <p class=\"font-bold text-amber-400\">Prueba 2B · Fuera de Rango</p>\n              <p class=\"text-slate-400 mt-0.5\">PUT /setpoint a 125 °C (Rechazo con 400 Bad Request).</p>\n            </button>\n            <button id=\"btnTest3\" type=\"button\" class=\"p-3 rounded-lg bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition\">\n              <p class=\"font-bold text-rose-400\">Prueba 3 · Fallo Calentador</p>\n              <p class=\"text-slate-400 mt-0.5\">Embalamiento térmico &gt;75 °C y alarma Sobretemperatura.</p>\n            </button>\n            <button id=\"btnTest4\" type=\"button\" class=\"p-3 rounded-lg bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition\">\n              <p class=\"font-bold text-violet-400\">Prueba 4 · Fallo de Agitador</p>\n              <p class=\"text-slate-400 mt-0.5\">Detiene motor (0 rpm), congela mezcla y activa alarma.</p>\n            </button>\n            <button id=\"btnTest5\" type=\"button\" class=\"p-3 rounded-lg bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition\">\n              <p class=\"font-bold text-orange-400\">Prueba 5 · Aborto + Conflicto 409</p>\n              <p class=\"text-slate-400 mt-0.5\">Ejecuta Aborto Seguro y prueba bloqueo 409 Conflict.</p>\n            </button>\n          </div>\n        </div>\n\n      </div>\n\n    </div>\n\n  </main>\n\n  <script>\n    let selectedWindow = \"1m\";\n    const httpLogs = [];\n    let isConnected = false;\n\n    function showToast(title, message, isError) {\n      const banner = document.getElementById(\"toastBanner\");\n      const dot = document.getElementById(\"toastDot\");\n      document.getElementById(\"toastTitle\").textContent = title;\n      document.getElementById(\"toastMsg\").textContent = message;\n      dot.className = \"w-2.5 h-2.5 rounded-full shrink-0 \" + (isError ? \"bg-rose-500\" : \"bg-emerald-400\");\n      banner.classList.remove(\"hidden\");\n    }\n\n    document.getElementById(\"btnCloseToast\").addEventListener(\"click\", () => {\n      document.getElementById(\"toastBanner\").classList.add(\"hidden\");\n    });\n\n\n    function setConnectionStatus(connected) {\n      isConnected = connected;\n      const statusBadge = document.getElementById(\"statusBadge\");\n      const statusDot = document.getElementById(\"statusDot\");\n      const statusText = document.getElementById(\"statusText\");\n      const errorBanner = document.getElementById(\"connectionErrorBanner\");\n      const base = document.getElementById(\"inputApiBase\").value.trim();\n\n      if (connected) {\n        errorBanner.classList.add(\"hidden\");\n        statusBadge.className = \"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-xs font-bold\";\n        statusDot.className = \"w-2 h-2 rounded-full bg-emerald-400\";\n        statusText.textContent = \"Conectado a Node-RED\";\n      } else {\n        document.getElementById(\"lblFailedUrl\").textContent = base;\n        errorBanner.classList.remove(\"hidden\");\n        statusBadge.className = \"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-300 text-xs font-bold\";\n        statusDot.className = \"w-2 h-2 rounded-full bg-rose-500 animate-ping\";\n        statusText.textContent = \"Desconectado\";\n        document.getElementById(\"badgePhase\").textContent = \"OFFLINE\";\n        document.getElementById(\"badgePhase\").className = \"text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-950/80 text-rose-400 border border-rose-800\";\n      }\n    }\n\n    // Petición HTTP REAL a Node-RED (CERO simulación interna)\n    async function apiRequest(method, path, body, isControlAction = false) {\n      const base = document.getElementById(\"inputApiBase\").value.replace(/\\/+$/, \"\");\n      const t0 = performance.now();\n      const controller = new AbortController();\n      const timer = setTimeout(() => controller.abort(), 2500);\n\n      try {\n        const res = await fetch(base + path, {\n          method,\n          headers: { \"Content-Type\": \"application/json\" },\n          body: body ? JSON.stringify(body) : undefined,\n          signal: controller.signal\n        });\n        clearTimeout(timer);\n        const latencyMs = Math.round(performance.now() - t0);\n        const data = await res.json();\n\n        setConnectionStatus(true);\n        if (isControlAction) {\n          recordHttpLog(method, path, res.status, latencyMs, data.message || data.error || \"OK\");\n        }\n        return { status: res.status, data, latencyMs };\n      } catch (err) {\n        clearTimeout(timer);\n        const latencyMs = Math.round(performance.now() - t0);\n        setConnectionStatus(false);\n        if (isControlAction) {\n          recordHttpLog(method, path, \"FAIL\", latencyMs, \"Error de conexión: Node-RED no responde en \" + base);\n          showToast(\"Error de Conexión HTTP\", \"No se pudo conectar con Node-RED en \" + base + \". Verifica que esté iniciado e instanciado.\", true);\n        }\n        throw err;\n      }\n    }\n\n    function recordHttpLog(method, path, status, latencyMs, detail) {\n      httpLogs.unshift({\n        time: new Date().toLocaleTimeString(),\n        method,\n        path,\n        status,\n        latencyMs,\n        detail\n      });\n      if (httpLogs.length > 30) httpLogs.pop();\n      renderHttpLogs();\n    }\n\n    function renderHttpLogs() {\n      const tbody = document.getElementById(\"tbodyHttpLogs\");\n      if (httpLogs.length === 0) return;\n      tbody.innerHTML = httpLogs.map(item => {\n        const badgeColor = typeof item.status === \"number\" && item.status < 400\n          ? (item.status === 201 ? \"bg-emerald-500/20 text-emerald-300 border-emerald-500/40\" : \"bg-sky-500/20 text-sky-300 border-sky-500/40\")\n          : \"bg-rose-500/20 text-rose-300 border-rose-500/40\";\n        return `<tr>\n          <td class=\"py-1.5 px-2 text-slate-400\">${item.time}</td>\n          <td class=\"py-1.5 px-2 font-semibold text-slate-200\">${item.method} ${item.path}</td>\n          <td class=\"py-1.5 px-2\"><span class=\"px-2 py-0.5 rounded border text-[11px] font-bold ${badgeColor}\">${item.status}</span></td>\n          <td class=\"py-1.5 px-2 text-emerald-400\">${item.latencyMs} ms</td>\n          <td class=\"py-1.5 px-2 text-slate-300\">${item.detail}</td>\n        </tr>`;\n      }).join(\"\");\n    }\n\n    // Chart.js\n    const ctxTemp = document.getElementById(\"chartTemp\").getContext(\"2d\");\n    const chartTemp = new Chart(ctxTemp, {\n      type: \"line\",\n      data: {\n        labels: [],\n        datasets: [\n          { label: \"Temperatura (°C)\", data: [], borderColor: \"#f59e0b\", backgroundColor: \"rgba(245,158,11,0.12)\", tension: 0.25, fill: true, pointRadius: 0 },\n          { label: \"Consigna (°C)\", data: [], borderColor: \"#38bdf8\", borderDash: [5, 5], tension: 0, pointRadius: 0 }\n        ]\n      },\n      options: {\n        responsive: true,\n        maintainAspectRatio: false,\n        animation: false,\n        scales: {\n          x: { ticks: { color: \"#64748b\", maxTicksLimit: 6 }, grid: { color: \"#1e293b\" } },\n          y: { min: 20, max: 95, ticks: { color: \"#94a3b8\" }, grid: { color: \"#1e293b\" } }\n        },\n        plugins: { legend: { labels: { color: \"#cbd5e1\", boxWidth: 12 } } }\n      }\n    });\n\n    const ctxProc = document.getElementById(\"chartProcess\").getContext(\"2d\");\n    const chartProcess = new Chart(ctxProc, {\n      type: \"line\",\n      data: {\n        labels: [],\n        datasets: [\n          { label: \"Nivel (L)\", data: [], borderColor: \"#0ea5e9\", tension: 0.2, pointRadius: 0 },\n          { label: \"Agitación (rpm)\", data: [], borderColor: \"#a855f7\", tension: 0.2, pointRadius: 0 },\n          { label: \"Concentración (%)\", data: [], borderColor: \"#10b981\", tension: 0.2, pointRadius: 0 }\n        ]\n      },\n      options: {\n        responsive: true,\n        maintainAspectRatio: false,\n        animation: false,\n        scales: {\n          x: { ticks: { color: \"#64748b\", maxTicksLimit: 6 }, grid: { color: \"#1e293b\" } },\n          y: { min: 0, max: 620, ticks: { color: \"#94a3b8\" }, grid: { color: \"#1e293b\" } }\n        },\n        plugins: { legend: { labels: { color: \"#cbd5e1\", boxWidth: 12 } } }\n      }\n    });\n\n    // Polling real hacia Node-RED cada 1000 ms\n    async function pollReactorData() {\n      try {\n        const [telRes, statRes, kpiRes, histRes] = await Promise.all([\n          apiRequest(\"GET\", \"/api/B03/telemetry\"),\n          apiRequest(\"GET\", \"/api/B03/status\"),\n          apiRequest(\"GET\", \"/api/B03/kpis\"),\n          apiRequest(\"GET\", \"/api/B03/history?window=\" + selectedWindow)\n        ]);\n\n        const tel = telRes.data;\n        const stat = statRes.data;\n        const kpis = kpiRes.data.kpis;\n\n        const tempVal = tel.variables.temperature.value;\n        const spTemp = tel.variables.temperature.setpoint;\n        const lvlVal = tel.variables.level.value;\n        const targetVol = tel.variables.level.target || 400;\n        const rpmVal = tel.variables.agitation.value;\n        const spRpm = tel.variables.agitation.setpoint;\n        const concVal = tel.variables.concentration.value;\n\n        document.getElementById(\"valTemp\").textContent = tempVal.toFixed(1);\n        document.getElementById(\"lblSpTemp\").textContent = spTemp;\n        document.getElementById(\"barTemp\").style.width = Math.min(100, (tempVal / 90) * 100) + \"%\";\n\n        document.getElementById(\"valLevel\").textContent = lvlVal.toFixed(1);\n        document.getElementById(\"lblTargetVol\").textContent = targetVol;\n        document.getElementById(\"barLevel\").style.width = Math.min(100, (lvlVal / 500) * 100) + \"%\";\n\n        document.getElementById(\"valRpm\").textContent = rpmVal.toFixed(0);\n        document.getElementById(\"lblSpRpm\").textContent = spRpm;\n        document.getElementById(\"barRpm\").style.width = Math.min(100, (rpmVal / 600) * 100) + \"%\";\n\n        document.getElementById(\"valConc\").textContent = concVal.toFixed(1);\n        document.getElementById(\"barConc\").style.width = Math.min(100, concVal) + \"%\";\n\n        const badgePhase = document.getElementById(\"badgePhase\");\n        badgePhase.textContent = tel.phase;\n        const phaseColors = {\n          IDLE: \"bg-slate-800 text-slate-300 border-slate-700\",\n          FILLING: \"bg-sky-500/20 text-sky-300 border-sky-500/40\",\n          HEATING_MIXING: \"bg-amber-500/20 text-amber-300 border-amber-500/40\",\n          DRAINING: \"bg-emerald-500/20 text-emerald-300 border-emerald-500/40\",\n          ABORTED: \"bg-rose-500/20 text-rose-300 border-rose-500/40\"\n        };\n        badgePhase.className = \"text-xs font-semibold px-2.5 py-0.5 rounded-full border \" + (phaseColors[tel.phase] || phaseColors.IDLE);\n        document.getElementById(\"lblActiveBatch\").textContent = tel.activeBatchId;\n        document.getElementById(\"lblTimestamp\").textContent = new Date(tel.timestamp).toLocaleTimeString();\n\n        // Animación SVG sincronizada con el estado real de Node-RED\n        const liquidHeight = Math.max(0, Math.min(182, (lvlVal / 500) * 182));\n        const liquidRect = document.getElementById(\"svgLiquidRect\");\n        liquidRect.setAttribute(\"y\", String(246 - liquidHeight));\n        liquidRect.setAttribute(\"height\", String(liquidHeight));\n        liquidRect.setAttribute(\"fill\", tempVal > 75 ? \"#ef4444\" : tempVal >= 55 ? \"#f97316\" : \"#0284c7\");\n\n        const impeller = document.getElementById(\"svgImpeller\");\n        if (rpmVal > 5) {\n          const dur = Math.max(0.18, 1.5 - (rpmVal / 600) * 1.3).toFixed(2) + \"s\";\n          impeller.style.setProperty(\"--spin-duration\", dur);\n        } else {\n          impeller.style.setProperty(\"--spin-duration\", \"0s\");\n        }\n\n        const inletOpen = stat.actuators.inletValveOpen;\n        const outletOpen = stat.actuators.outletValveOpen;\n        document.getElementById(\"svgInletValve\").setAttribute(\"fill\", inletOpen ? \"#22c55e\" : \"#ef4444\");\n        document.getElementById(\"svgInletStream\").classList.toggle(\"hidden\", !inletOpen);\n        document.getElementById(\"svgOutletValve\").setAttribute(\"fill\", outletOpen ? \"#22c55e\" : \"#ef4444\");\n        document.getElementById(\"svgOutletStream\").classList.toggle(\"hidden\", !outletOpen);\n        document.getElementById(\"svgHeaterCoil\").setAttribute(\"stroke\", stat.actuators.heaterPower_kW > 0.1 ? \"#f97316\" : \"#475569\");\n\n        document.getElementById(\"actInlet\").textContent = inletOpen ? \"ABIERTA\" : \"CERRADA\";\n        document.getElementById(\"actInlet\").className = \"font-bold \" + (inletOpen ? \"text-emerald-400\" : \"text-rose-400\");\n        document.getElementById(\"actOutlet\").textContent = outletOpen ? \"ABIERTA\" : \"CERRADA\";\n        document.getElementById(\"actOutlet\").className = \"font-bold \" + (outletOpen ? \"text-emerald-400\" : \"text-rose-400\");\n        document.getElementById(\"actHeater\").textContent = stat.actuators.heaterPower_kW.toFixed(1) + \" kW\";\n        document.getElementById(\"actMotor\").textContent = stat.actuators.agitatorMotor_kW.toFixed(2) + \" kW\";\n\n        // KPIs\n        document.getElementById(\"kpiBatchesH\").textContent = kpis.batchesPerHour.value.toFixed(2);\n        document.getElementById(\"kpiDurationMin\").textContent = kpis.batchDuration.value.toFixed(2);\n        document.getElementById(\"kpiThermalDev\").textContent = kpis.thermalDeviation.value.toFixed(2);\n        document.getElementById(\"kpiVolumeL\").textContent = kpis.processedVolume.value.toFixed(0);\n        document.getElementById(\"kpiEnergyKwh\").textContent = kpis.estimatedEnergy.value.toFixed(4);\n\n        // Alarmas (garantizar arreglo seguro)\n        const rawAlarms = stat.alarms;\n        const alarms = Array.isArray(rawAlarms) ? rawAlarms : (rawAlarms ? [rawAlarms] : []);\n        const tbodyAlarms = document.getElementById(\"tbodyAlarms\");\n        if (alarms.length === 0) {\n          tbodyAlarms.innerHTML = `<tr><td colspan=\"6\" class=\"py-3 text-center text-slate-500\">Sin alarmas registradas en Node-RED.</td></tr>`;\n        } else {\n          tbodyAlarms.innerHTML = alarms.slice().reverse().slice(0, 8).map(a => {\n            const isAck = Boolean(a.acknowledged);\n            const ackBadge = isAck\n              ? `<span class=\"px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold\">RECONOCIDA (ACK)</span>`\n              : `<span class=\"px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold animate-pulse\">ACTIVA</span>`;\n            return `<tr>\n              <td class=\"py-1.5 px-2 font-bold text-slate-200\">${a.code}</td>\n              <td class=\"py-1.5 px-2 text-rose-400 font-semibold\">${a.severity}</td>\n              <td class=\"py-1.5 px-2 text-slate-400\">${a.threshold}</td>\n              <td class=\"py-1.5 px-2 text-amber-300\">${a.value}</td>\n              <td class=\"py-1.5 px-2 text-slate-400\">${new Date(a.timestamp).toLocaleTimeString()}</td>\n              <td class=\"py-1.5 px-2\">${ackBadge}</td>\n            </tr>`;\n          }).join(\"\");\n        }\n\n        // Gráficos\n        if (histRes.status === 200 && histRes.data.samples) {\n          const samples = histRes.data.samples;\n          const labels = samples.map(s => new Date(s.timestamp).toLocaleTimeString());\n          chartTemp.data.labels = labels;\n          chartTemp.data.datasets[0].data = samples.map(s => s.temperature_C);\n          chartTemp.data.datasets[1].data = samples.map(s => s.sp_temp_C);\n          chartTemp.update();\n\n          chartProcess.data.labels = labels;\n          chartProcess.data.datasets[0].data = samples.map(s => s.level_L);\n          chartProcess.data.datasets[1].data = samples.map(s => s.agitation_rpm);\n          chartProcess.data.datasets[2].data = samples.map(s => s.concentration_pct);\n          chartProcess.update();\n        }\n      } catch (err) {\n        // Mantiene estado desconectado real\n      }\n    }\n\n    // UI Tab navigation\n    document.getElementById(\"tabBtnOp\").addEventListener(\"click\", () => {\n      document.getElementById(\"viewOperation\").classList.remove(\"hidden\");\n      document.getElementById(\"viewEngineering\").classList.add(\"hidden\");\n      document.getElementById(\"tabBtnOp\").className = \"px-3 py-1 text-xs font-semibold rounded-md bg-sky-600 text-white transition\";\n      document.getElementById(\"tabBtnEng\").className = \"px-3 py-1 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition\";\n    });\n\n    document.getElementById(\"tabBtnEng\").addEventListener(\"click\", () => {\n      document.getElementById(\"viewOperation\").classList.add(\"hidden\");\n      document.getElementById(\"viewEngineering\").classList.remove(\"hidden\");\n      document.getElementById(\"tabBtnEng\").className = \"px-3 py-1 text-xs font-semibold rounded-md bg-sky-600 text-white transition\";\n      document.getElementById(\"tabBtnOp\").className = \"px-3 py-1 text-xs font-semibold rounded-md text-slate-400 hover:text-white transition\";\n    });\n\n    // Control buttons\n    document.getElementById(\"btnStartBatch\").addEventListener(\"click\", async () => {\n      const batchId = document.getElementById(\"inputBatchId\").value.trim() || \"LOT-001\";\n      const targetVolume_L = Number(document.getElementById(\"inputTargetVol\").value);\n      try {\n        const res = await apiRequest(\"POST\", \"/api/B03/batches/\" + encodeURIComponent(batchId), { targetVolume_L }, true);\n        showToast(\"POST /api/B03/batches/\" + batchId + \" (\" + res.status + \")\", res.data.message || res.data.error, res.status >= 400);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnQueryBatch\").addEventListener(\"click\", async () => {\n      const batchId = document.getElementById(\"inputBatchId\").value.trim() || \"LOT-001\";\n      try {\n        const res = await apiRequest(\"GET\", \"/api/B03/batches/\" + encodeURIComponent(batchId), null, true);\n        showToast(\"GET /api/B03/batches/\" + batchId + \" (\" + res.status + \")\", JSON.stringify(res.data), res.status >= 400);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnUpdateSetpoint\").addEventListener(\"click\", async () => {\n      const temperature_C = Number(document.getElementById(\"inputSpTemp\").value);\n      const agitation_rpm = Number(document.getElementById(\"inputSpRpm\").value);\n      try {\n        const res = await apiRequest(\"PUT\", \"/api/B03/setpoint\", { temperature_C, agitation_rpm }, true);\n        showToast(\"PUT /api/B03/setpoint (\" + res.status + \")\", res.data.message || res.data.error, res.status >= 400);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnAbortBatch\").addEventListener(\"click\", async () => {\n      try {\n        const res = await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"ABORT_BATCH\" }, true);\n        showToast(\"POST /api/B03/commands (\" + res.status + \")\", res.data.message || res.data.error, res.status >= 400);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnAckAlarms\").addEventListener(\"click\", async () => {\n      try {\n        const res = await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"ACK_ALARMS\" }, true);\n        showToast(\"ACK Alarmas (\" + res.status + \")\", res.data.message || \"Alarmas reconocidas\", false);\n        await pollReactorData();\n      } catch (e) {}\n    });\n\n    document.querySelectorAll(\".btn-window\").forEach(btn => {\n      btn.addEventListener(\"click\", () => {\n        selectedWindow = btn.dataset.window;\n        document.querySelectorAll(\".btn-window\").forEach(b => {\n          b.className = \"btn-window px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700\";\n        });\n        btn.className = \"btn-window px-2.5 py-1 rounded text-xs font-semibold bg-sky-600 text-white\";\n      });\n    });\n\n    document.getElementById(\"btnInvalidWindow\").addEventListener(\"click\", async () => {\n      try {\n        const res = await apiRequest(\"GET\", \"/api/B03/history?window=xyz\", null, true);\n        showToast(\"GET /api/B03/history?window=xyz (\" + res.status + \")\", res.data.error, true);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnTest1\").addEventListener(\"click\", async () => {\n      try {\n        await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"RESET_FAULTS\" }, false);\n        const id = \"LOT-\" + Math.floor(100 + Math.random() * 899);\n        document.getElementById(\"inputBatchId\").value = id;\n        const res = await apiRequest(\"POST\", \"/api/B03/batches/\" + id, { targetVolume_L: 400, temperature_C: 65, agitation_rpm: 450 }, true);\n        showToast(\"Prueba 1 · Lote Normal (\" + res.status + \")\", res.data.message || res.data.error, res.status >= 400);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnTest2a\").addEventListener(\"click\", async () => {\n      document.getElementById(\"inputSpTemp\").value = 70;\n      document.getElementById(\"inputSpRpm\").value = 520;\n      try {\n        const res = await apiRequest(\"PUT\", \"/api/B03/setpoint\", { temperature_C: 70, agitation_rpm: 520 }, true);\n        showToast(\"Prueba 2A · Consigna Válida (\" + res.status + \")\", res.data.message || res.data.error, res.status >= 400);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnTest2b\").addEventListener(\"click\", async () => {\n      try {\n        const res = await apiRequest(\"PUT\", \"/api/B03/setpoint\", { temperature_C: 125, agitation_rpm: 450 }, true);\n        showToast(\"Prueba 2B · Consigna Fuera de Rango (\" + res.status + \")\", res.data.error, true);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnTest3\").addEventListener(\"click\", async () => {\n      try {\n        const res = await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"SET_FAULT\", faultType: \"HEATER_RUNAWAY\" }, true);\n        showToast(\"Prueba 3 · Fallo Calentador (\" + res.status + \")\", \"Falla inyectada en Node-RED\", false);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnTest4\").addEventListener(\"click\", async () => {\n      try {\n        const res = await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"SET_FAULT\", faultType: \"AGITATOR_FAIL\" }, true);\n        showToast(\"Prueba 4 · Fallo de Agitador (\" + res.status + \")\", \"Falla inyectada en Node-RED\", false);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnTest5\").addEventListener(\"click\", async () => {\n      try {\n        await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"ABORT_BATCH\" }, true);\n        const conflictRes = await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"START_BATCH\" }, true);\n        showToast(\"Prueba 5 · Aborto (\" + conflictRes.status + \")\", conflictRes.data.error, true);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnResetFaults\").addEventListener(\"click\", async () => {\n      try {\n        const res = await apiRequest(\"POST\", \"/api/B03/commands\", { command: \"RESET_FAULTS\" }, true);\n        showToast(\"Fallas Restablecidas (\" + res.status + \")\", res.data.message, false);\n      } catch (e) {}\n    });\n\n    document.getElementById(\"btnClearLogs\").addEventListener(\"click\", () => {\n      httpLogs.length = 0;\n      document.getElementById(\"tbodyHttpLogs\").innerHTML = `<tr><td colspan=\"5\" class=\"py-4 text-center text-slate-500\">Bitácora limpiada.</td></tr>`;\n    });\n\n    // Iniciar sondeo estricto a Node-RED\n    let pollInterval = null;\n    window.addEventListener(\"load\", () => {\n      if (pollInterval) clearInterval(pollInterval);\n      pollReactorData();\n      pollInterval = setInterval(pollReactorData, 1000);\n    });\n  </script>\n</body>\n</html>",
+        "output": "str",
+        "x": 560,
+        "y": 990,
+        "wires": [
+            [
+                "http_res_html"
+            ]
+        ]
+    },
+    {
+        "id": "http_res_html",
+        "type": "http response",
+        "z": "tab_b03_api",
+        "name": "HTTP Response (HTML)",
+        "statusCode": "200",
+        "headers": {
+            "Content-Type": "text/html; charset=utf-8"
+        },
+        "x": 870,
+        "y": 1000,
+        "wires": []
+    }
+]

@@ -1,7 +1,7 @@
 {
     "name": "Reactor-de-mezcla-industrial",
     "description": "Proyecto sobre un Mezclador industrial 6TO B",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "dependencies": {},
     "node-red": {
         "settings": {
