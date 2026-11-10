@@ -6,7 +6,7 @@ Gemelo digital de un **reactor de mezcla industrial por lotes** desarrollado en 
 > Universidad Técnica de Machala (UTMACH)
 
 **Integrantes:**
-- Oscar Elias Apolo Cheverria
+- Oscar Elias Apolo Echeverria
 - Steven Paul Valdiviezo Suquilanda
 - Johan Andres Villamar Brito
 
